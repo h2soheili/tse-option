@@ -90,8 +90,12 @@ def stock_price(symbol):
 
 def tse_options(symbol, stock=True):
     url = "https://old.tse.ir/json/MarketWatch/MarketWatch_7.xml"
-    headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
-    data = pd.read_html(url)[0]
+    headers = {
+        'Content-Type': 'text/html;charset=utf-8',
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
+    res = rq.get(url, headers=headers, verify=False)
+    res.encoding = res.apparent_encoding
+    data = pd.read_html(res.text)[0]
     data = data[data["نماد"].notna()]
     if stock == True:
         data["نماد دارایی پایه"] = [data.iloc[i]['نام'].split("-")[0].split(" ")[1] for i in range(len(data))]
